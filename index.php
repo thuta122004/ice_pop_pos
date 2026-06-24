@@ -46,38 +46,53 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <?php
                     $result = $conn->query("SELECT * FROM products WHERE is_active = 1 AND stock_quantity > 0");
-                    while ($row = $result->fetch_assoc()): 
-                    ?>
-                    <div class="bg-white rounded-2xl border border-slate-200/60 p-5 flex flex-col justify-between transition hover:shadow-md hover:border-slate-300/80">
-                        <div>
-                            <div class="w-full h-48 bg-slate-50 rounded-xl overflow-hidden mb-4 border border-slate-100 flex items-center justify-center">
-                                <?php if (!empty($row['image_path'])): ?>
-                                    <img src="uploads/<?= htmlspecialchars($row['image_path']) ?>" alt="<?= htmlspecialchars($row['name']) ?>" class="w-full h-full object-contain">
-                                <?php else: ?>
-                                    <div class="text-xs text-slate-400 font-medium tracking-wide uppercase">No Image</div>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <div class="flex justify-between items-start gap-2">
-                                <h3 class="text-base font-bold text-slate-800 tracking-tight leading-tight"><?= htmlspecialchars($row['name']) ?></h3>
-                                <span class="bg-pink-50 text-pink-700 font-mono font-bold px-2 py-0.5 rounded-md text-xs whitespace-nowrap">
-                                    <?= number_format($row['price']) ?> MMK
-                                </span>
-                            </div>
-                        </div>
 
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-xs text-slate-400">
-                                Stock: <span class="font-bold text-slate-600 font-mono"><?= $row['stock_quantity'] ?></span>
-                            </span>
-                            <button type="button" 
-                                    onclick="addToCart(<?= $row['product_id'] ?>, '<?= htmlspecialchars($row['name']) ?>', <?= $row['price'] ?>, <?= $row['stock_quantity'] ?>)"
-                                    class="bg-pink-500 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-pink-600 active:scale-95 transition-all tracking-wide shadow-sm hover:shadow">
-                                Add to Order
-                            </button>
+                    if ($result->num_rows > 0):
+                        while ($row = $result->fetch_assoc()): 
+                    ?>
+                        <div class="bg-white rounded-2xl border border-slate-200/60 p-5 flex flex-col justify-between transition hover:shadow-md hover:border-slate-300/80">
+                            <div>
+                                <div class="w-full h-48 bg-slate-50 rounded-xl overflow-hidden mb-4 border border-slate-100 flex items-center justify-center">
+                                    <?php if (!empty($row['image_path'])): ?>
+                                        <img src="uploads/<?= htmlspecialchars($row['image_path']) ?>" alt="<?= htmlspecialchars($row['name']) ?>" class="w-full h-full object-contain">
+                                    <?php else: ?>
+                                        <div class="text-xs text-slate-400 font-medium tracking-wide uppercase">No Image</div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="flex justify-between items-start gap-2">
+                                    <h3 class="text-base font-bold text-slate-800 tracking-tight leading-tight"><?= htmlspecialchars($row['name']) ?></h3>
+                                    <span class="bg-pink-50 text-pink-700 font-mono font-bold px-2 py-0.5 rounded-md text-xs whitespace-nowrap">
+                                        <?= number_format($row['price']) ?> MMK
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                <span class="text-xs text-slate-400">
+                                    Stock: <span class="font-bold text-slate-600 font-mono"><?= $row['stock_quantity'] ?></span>
+                                </span>
+                                <button type="button" 
+                                        onclick="addToCart(<?= $row['product_id'] ?>, '<?= htmlspecialchars($row['name']) ?>', <?= $row['price'] ?>, <?= $row['stock_quantity'] ?>)"
+                                        class="bg-pink-500 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-pink-600 active:scale-95 transition-all tracking-wide shadow-sm hover:shadow">
+                                    Add to Order
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <?php endwhile; ?>
+                    <?php 
+                        endwhile; 
+                    else: 
+                    ?>
+                        <div class="col-span-1 sm:col-span-2 bg-white rounded-2xl border border-slate-200/60 p-12 flex flex-col items-center justify-center text-center shadow-sm">
+                            <div class="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center text-pink-500 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5h6.75" />
+                                </svg>
+                            </div>
+                            <h3 class="text-slate-800 font-bold text-sm">No Products Available</h3>
+                            <p class="text-slate-400 text-xs mt-1 max-w-xs">There are currently no items in stock to display. Please add products in the management section.</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -85,6 +100,10 @@
                 <h2 class="text-lg font-bold text-slate-800 mb-4 pb-3 border-b border-slate-100">Current Order</h2>
                 
                 <form action="process.php" method="POST">
+                    <div class="mb-4">
+                        <input type="text" name="customer_name" placeholder="Customer Name (Optional)" 
+                            class="w-full bg-slate-50 border border-slate-200/60 text-slate-800 text-xs font-medium px-3 py-2.5 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400 transition placeholder:text-slate-400">
+                    </div>
                     <div id="cart-items" class="space-y-3 max-h-80 overflow-y-auto mb-6 pr-1 divide-y divide-slate-100">
                         <p id="empty-cart-msg" class="text-xs text-slate-400 text-center py-10 font-medium">Your cart is currently empty.</p>
                     </div>
@@ -170,14 +189,15 @@
 
         function renderCart() {
             const container = document.getElementById('cart-items');
-            const emptyMsg = document.getElementById('empty-cart-msg');
             const checkoutBtn = document.getElementById('checkout-btn');
             
             container.innerHTML = '';
             
             const keys = Object.keys(cart);
+            
             if (keys.length === 0) {
-                container.appendChild(emptyMsg);
+                container.innerHTML = `<p id="empty-cart-msg" class="text-xs text-slate-400 text-center py-10 font-medium">Your cart is currently empty.</p>`;
+                
                 document.getElementById('summary-qty').innerText = "0 items";
                 document.getElementById('summary-total').innerText = "0";
                 checkoutBtn.disabled = true;

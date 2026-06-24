@@ -17,6 +17,12 @@
                 <p class="text-slate-400 text-sm mt-1 font-medium">Configure products and stock levels</p>
             </div>
             <div class="flex items-center gap-2">
+                <a href="history.php" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-pink-50 text-slate-600 hover:text-pink-600 font-bold px-4 py-2.5 rounded-xl text-xs transition-all tracking-wide border border-slate-200/40 hover:border-pink-200/60 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    History
+                </a>
                 <a href="reports.php" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-pink-50 text-slate-600 hover:text-pink-600 font-bold px-4 py-2.5 rounded-xl text-xs transition-all tracking-wide border border-slate-200/40 hover:border-pink-200/60 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.25c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 0 1 3 18.375v-5.25ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125v-9.75ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
@@ -48,47 +54,59 @@
                     <tbody class="divide-y divide-slate-100">
                         <?php
                         $result = $conn->query("SELECT * FROM products WHERE is_active = 1");
-                        while ($row = $result->fetch_assoc()): ?>
-                        <tr class="hover:bg-slate-50/50 transition">
-                            <form action="process_product.php" method="POST" enctype="multipart/form-data">
-                                <input type="hidden" name="id" value="<?= $row['product_id'] ?>">
-                                
-                                <td class="p-4 align-middle">
-                                    <?php if (!empty($row['image_path'])): ?>
-                                        <img src="uploads/<?= htmlspecialchars($row['image_path']) ?>" alt="<?= htmlspecialchars($row['name']) ?>" class="w-12 h-12 object-cover rounded-xl shadow-sm border border-slate-100">
-                                    <?php else: ?>
-                                        <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-[10px] text-slate-400 font-bold border border-slate-100 tracking-wide uppercase">No Img</div>
-                                    <?php endif; ?>
-                                </td>
+                        
+                        if ($result->num_rows > 0):
+                            while ($row = $result->fetch_assoc()): 
+                        ?>
+                            <tr class="hover:bg-slate-50/50 transition">
+                                <form action="process_product.php" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="id" value="<?= $row['product_id'] ?>">
+                                    
+                                    <td class="p-4 align-middle">
+                                        <?php if (!empty($row['image_path'])): ?>
+                                            <img src="uploads/<?= htmlspecialchars($row['image_path']) ?>" alt="<?= htmlspecialchars($row['name']) ?>" class="w-12 h-12 object-cover rounded-xl shadow-sm border border-slate-100">
+                                        <?php else: ?>
+                                            <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-[10px] text-slate-400 font-bold border border-slate-100 tracking-wide uppercase">No Img</div>
+                                        <?php endif; ?>
+                                    </td>
 
-                                <td class="p-4 align-middle">
-                                    <input type="text" name="name" value="<?= htmlspecialchars($row['name']) ?>" class="bg-transparent text-sm font-bold text-slate-800 outline-none focus:border-b focus:border-pink-500 w-full mb-1.5 transition" required>
-                                    <input type="file" name="edit_image" accept="image/*" class="block text-[11px] text-slate-400 file:mr-2 file:py-0.5 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-slate-100 file:text-slate-600 hover:file:bg-pink-50 hover:file:text-pink-600 cursor-pointer w-full max-w-xs transition">
-                                </td>
+                                    <td class="p-4 align-middle">
+                                        <input type="text" name="name" value="<?= htmlspecialchars($row['name']) ?>" class="bg-transparent text-sm font-bold text-slate-800 outline-none focus:border-b focus:border-pink-500 w-full mb-1.5 transition" required>
+                                        <input type="file" name="edit_image" accept="image/*" class="block text-[11px] text-slate-400 file:mr-2 file:py-0.5 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-slate-100 file:text-slate-600 hover:file:bg-pink-50 hover:file:text-pink-600 cursor-pointer w-full max-w-xs transition">
+                                    </td>
 
-                                <td class="p-4 align-middle text-right">
-                                    <div class="flex items-center justify-end gap-1.5 text-sm font-mono font-bold text-slate-800">
-                                        <input type="number" name="price" value="<?= round($row['price']) ?>" step="100" min="100" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="bg-transparent text-right outline-none border-b border-transparent focus:border-pink-500 w-20 transition" required>
-                                        <span class="text-xs text-slate-400 font-sans">MMK</span>
-                                    </div>
-                                </td>
-                                
-                                <td class="p-4 align-middle">
-                                    <div class="flex items-center justify-center gap-2.5">
-                                        <span class="bg-pink-50 text-pink-700 font-mono font-bold px-2.5 py-1 rounded-lg text-xs min-w-[32px] text-center border border-pink-100/60 shadow-sm">
-                                            <?= $row['stock_quantity'] ?>
-                                        </span>
-                                        <input type="number" name="add_stock" min="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="+Qty" class="w-20 bg-slate-50 border border-slate-200/60 rounded-xl px-2 py-1 text-xs text-center font-mono font-bold outline-pink-500 transition">
-                                    </div>
-                                </td>
+                                    <td class="p-4 align-middle text-right">
+                                        <div class="flex items-center justify-end gap-1.5 text-sm font-mono font-bold text-slate-800">
+                                            <input type="number" name="price" value="<?= round($row['price']) ?>" step="100" min="100" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="bg-transparent text-right outline-none border-b border-transparent focus:border-pink-500 w-20 transition" required>
+                                            <span class="text-xs text-slate-400 font-sans">MMK</span>
+                                        </div>
+                                    </td>
+                                    
+                                    <td class="p-4 align-middle">
+                                        <div class="flex items-center justify-center gap-2.5">
+                                            <span class="bg-pink-50 text-pink-700 font-mono font-bold px-2.5 py-1 rounded-lg text-xs min-w-[32px] text-center border border-pink-100/60 shadow-sm">
+                                                <?= $row['stock_quantity'] ?>
+                                            </span>
+                                            <input type="number" name="add_stock" min="1" oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="+Qty" class="w-20 bg-slate-50 border border-slate-200/60 rounded-xl px-2 py-1 text-xs text-center font-mono font-bold outline-pink-500 transition">
+                                        </div>
+                                    </td>
 
-                                <td class="p-4 align-middle text-right whitespace-nowrap text-xs">
-                                    <button type="submit" name="update" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl hover:bg-slate-900 shadow-sm transition mr-1.5">Save</button>
-                                    <button type="button" onclick="confirmDelete(<?= $row['product_id'] ?>)" class="text-slate-300 hover:text-red-400 font-semibold text-lg transition px-1">×</button>
+                                    <td class="p-4 align-middle text-right whitespace-nowrap text-xs">
+                                        <button type="submit" name="update" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl hover:bg-slate-900 shadow-sm transition mr-1.5">Save</button>
+                                        <button type="button" onclick="confirmDelete(<?= $row['product_id'] ?>)" class="text-slate-300 hover:text-red-400 font-semibold text-lg transition px-1">×</button>
+                                    </td>
+                                </form>
+                            </tr>
+                        <?php 
+                            endwhile; 
+                        else: 
+                        ?>
+                            <tr>
+                                <td colspan="5" class="p-10 text-center text-slate-400 text-xs font-medium italic">
+                                    No active flavor records found. Add a new Ice Pop using the form on the right.
                                 </td>
-                            </form>
-                        </tr>
-                        <?php endwhile; ?>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

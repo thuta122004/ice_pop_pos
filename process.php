@@ -43,8 +43,10 @@ if (isset($_POST['checkout']) && !empty($_POST['items'])) {
             throw new Exception("Your cart is empty.");
         }
 
-        $stmt = $conn->prepare("INSERT INTO transactions (total_amount) VALUES (?)");
-        $stmt->bind_param("d", $total_amount);
+        $customer_name = isset($_POST['customer_name']) ? trim($_POST['customer_name']) : '';
+
+        $stmt = $conn->prepare("INSERT INTO transactions (total_amount, customer_name) VALUES (?, ?)");
+        $stmt->bind_param("ds", $total_amount, $customer_name);
         $stmt->execute();
         $transaction_id = $conn->insert_id;
 
@@ -115,6 +117,9 @@ if (isset($_POST['checkout']) && !empty($_POST['items'])) {
             <div class="text-xs text-slate-500 space-y-1 mb-4 font-mono">
                 <div class="flex justify-between"><span>Receipt No:</span><span class="font-bold text-slate-700">#<?= str_pad($transaction_id, 6, "0", STR_PAD_LEFT) ?></span></div>
                 <div class="flex justify-between"><span>Date/Time:</span><span><?= date("Y-m-d H:i:s") ?></span></div>
+                <?php if (!empty($customer_name)): ?>
+                <div class="flex justify-between"><span>Customer:</span><span class="font-bold text-slate-700"><?= htmlspecialchars($customer_name) ?></span></div>
+                <?php endif; ?>
             </div>
 
             <table class="w-full text-sm font-mono border-b border-dashed pb-4 mb-4">
