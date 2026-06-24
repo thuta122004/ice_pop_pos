@@ -54,25 +54,32 @@ $result = $conn->query($query);
                         <th class="p-4 font-bold">Customer</th>
                         <th class="p-4 font-bold">Items Sold</th>
                         <th class="p-4 font-bold text-right">Total Amount</th>
-                    </tr>
+                        <th class="p-4 font-bold text-center">Action</th> </tr>
                 </thead>
+
                 <tbody class="divide-y divide-slate-100">
                     <?php if ($result->num_rows > 0): ?>
                         <?php while ($row = $result->fetch_assoc()): ?>
                         <tr class="hover:bg-slate-50/50 transition text-sm">
                             <td class="p-4 font-mono font-bold text-slate-600">#<?= str_pad($row['transaction_id'], 6, "0", STR_PAD_LEFT) ?></td>
-                            <td class="p-4 text-slate-500">
-                                <?= date("Y-m-d h:i A", strtotime($row['transaction_date'])) ?>
-                            </td>
+                            <td class="p-4 text-slate-500"><?= date("Y-m-d h:i A", strtotime($row['transaction_date'])) ?></td>
                             <td class="p-4 font-medium text-slate-700"><?= !empty($row['customer_name']) ? htmlspecialchars($row['customer_name']) : '<span class="text-slate-300 italic">N/A</span>' ?></td>
                             <td class="p-4 text-slate-600 text-xs max-w-md truncate"><?= htmlspecialchars($row['items']) ?></td>
                             <td class="p-4 text-right font-bold text-pink-600 font-mono"><?= number_format($row['total_amount']) ?> MMK</td>
+                            <td class="p-4 text-center">
+                                <a href="view_receipt.php?id=<?= $row['transaction_id'] ?>" class="text-pink-500 hover:text-pink-700 font-bold text-xs underline">View</a>
+                            </td>
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="5" class="p-10 text-center text-slate-400 text-xs font-medium italic">
-                                No transaction records available.
+                            <td colspan="6" class="p-12 text-center text-slate-400 italic">
+                                <div class="flex flex-col items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-slate-300">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3-6h6m-6 3h6m-6-3h6m-6 3h6m3 3H6.75a2.25 2.25 0 01-2.25-2.25V6.75A2.25 2.25 0 016.75 4.5h10.5A2.25 2.25 0 0119.5 6.75v10.5a2.25 2.25 0 01-2.25 2.25z" />
+                                    </svg>
+                                    <span class="text-sm font-medium">No transaction records found.</span>
+                                </div>
                             </td>
                         </tr>
                     <?php endif; ?>

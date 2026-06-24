@@ -51,8 +51,8 @@ if (isset($_POST['checkout']) && !empty($_POST['items'])) {
         $transaction_id = $conn->insert_id;
 
         foreach ($items_to_save as $item) {
-            $item_stmt = $conn->prepare("INSERT INTO transaction_items (transaction_id, product_id, quantity) VALUES (?, ?, ?)");
-            $item_stmt->bind_param("iii", $transaction_id, $item['product_id'], $item['quantity']);
+            $item_stmt = $conn->prepare("INSERT INTO transaction_items (transaction_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+            $item_stmt->bind_param("iiid", $transaction_id, $item['product_id'], $item['quantity'], $item['price']);
             $item_stmt->execute();
 
             $update_stmt = $conn->prepare("UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ?");
